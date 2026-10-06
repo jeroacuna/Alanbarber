@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Check } from "lucide-react";
+import { DayPicker } from "react-day-picker";
+import { es } from "react-day-picker/locale";
+import "react-day-picker/style.css";
 import {
   Barber, Service, Booking, getBarbers, getServices, getAvailableSlots,
   createAppointment, SlotUnavailableError, bookingWhatsAppLink,
@@ -62,7 +65,7 @@ export default function BookingFlow() {
   }
   async function loadDays(b: Barber, s: Service) {
     setDays(null);
-    const list = nextDays(14);
+    const list = nextDays(30);
     const res = await Promise.all(list.map((d) => getAvailableSlots(b.id, s.id, d)));
     setDays(Object.fromEntries(list.map((d, i) => [d, res[i]])));
   }
@@ -108,13 +111,12 @@ export default function BookingFlow() {
           ))}
 
           {step === 2 && (days === null ? <p className="text-white/50">Buscando días disponibles…</p> : (
-            <div className="grid grid-cols-3 gap-2">
-              {Object.entries(days).map(([d, s]) => (
-                <button key={d} disabled={!s.length} onClick={() => { setDate(d); setStep(3); }}
-                  className="min-h-16 rounded-xl border border-white/15 px-2 text-sm capitalize transition hover:bg-white/10 disabled:opacity-25 disabled:hover:bg-transparent">
-                  {new Date(d + "T12:00:00").toLocaleDateString("es-AR", { weekday: "short", day: "numeric" })}
-                </button>
-              ))}
+            <div className="alan-cal rounded-2xl border border-white/15 p-3">
+              <DayPicker mode="single" locale={es} weekStartsOn={1}
+                selected={date ? new Date(date + "T12:00:00") : undefined}
+                onSelect={(d) => { if (d) { setDate(d.toLocaleDateString("en-CA")); setStep(3); } }}
+                disabled={(d) => !days[d.toLocaleDateString("en-CA")]?.length}
+                startMonth={new Date()} endMonth={new Date(Date.now() + 30 * 864e5)} />
             </div>
           ))}
 

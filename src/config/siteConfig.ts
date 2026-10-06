@@ -1,7 +1,7 @@
 // Único lugar para cambiar datos del negocio.
 export const siteConfig = {
   name: "ALAN Barber & Co.",
-  shortName: "ALAN",
+  shortName: "ALAN BARBER",
   tagline: "Tu estilo empieza acá.",
   timezone: "America/Argentina/Buenos_Aires",
   instagram: { handle: "@alanbarberandco", url: "https://instagram.com/alanbarberandco" },

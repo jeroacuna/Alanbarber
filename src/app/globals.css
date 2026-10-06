@@ -3,3 +3,10 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Calendario de reservas */
+.alan-cal .rdp-root { --rdp-accent-color: #b08d57; --rdp-accent-background-color: rgba(176,141,87,.18); --rdp-day-height: 46px; --rdp-day-width: 46px; display: flex; justify-content: center; }
+.alan-cal .rdp-month_caption { text-transform: capitalize; font-weight: 700; }
+.alan-cal .rdp-day button:hover:not([disabled]) { background: rgba(255,255,255,.1); }
+.alan-cal .rdp-disabled { opacity: .2; }
+.alan-cal .rdp-today:not(.rdp-selected) { color: #b08d57; }

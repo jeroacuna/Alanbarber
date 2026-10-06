@@ -59,7 +59,7 @@ export async function cancelByToken(token: string): Promise<boolean> {
 
 export function bookingWhatsAppLink(b: { barber: string; service: string; date: string; time: string; name: string }) {
   return whatsappLink(
-    `Hola! Acabo de reservar un turno en ${siteConfig.shortName} Barber.\n\n` +
+    `Hola! Acabo de reservar un turno en ${siteConfig.name}.\n\n` +
     `Barbero: ${b.barber}\nServicio: ${b.service}\nFecha: ${b.date}\nHora: ${b.time}\n\nNombre: ${b.name}`
   );
-}
+};
