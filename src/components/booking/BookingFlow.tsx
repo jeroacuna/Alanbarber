@@ -14,7 +14,14 @@ const fmtDate = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("es-
 const money = (n: number) => "$" + Number(n).toLocaleString("es-AR");
 const nextDays = (n: number) => Array.from({ length: n }, (_, i) => new Date(Date.now() + i * 864e5).toLocaleDateString("en-CA", { timeZone: tz }));
 const TITLES = ["¿Con quién querés reservar?", "¿Qué te hacemos?", "Elegí el día", "Elegí la hora", "Tus datos", "Turno confirmado"];
-const btn = "min-h-14 w-full rounded-xl border border-white/15 px-5 text-left transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-[#b08d57]";
+const btn = "min-h-14 w-full rounded-xl border border-white/15 px-5 text-left transition active:scale-[0.98] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-[#b08d57]";
+
+const gDate = (iso: string) => new Date(iso).toISOString().replace(/[-:]|\.\d{3}/g, "");
+const gcalUrl = (s: string, e: string, title: string) =>
+  "https://calendar.google.com/calendar/render?" + new URLSearchParams({
+    action: "TEMPLATE", text: title, dates: `${gDate(s)}/${gDate(e)}`, ctz: tz,
+    location: `${siteConfig.address.line1}, ${siteConfig.address.city}`, details: `Turno en ${siteConfig.name}`,
+  }).toString();
 
 function downloadIcs(startIso: string, endIso: string, title: string) {
   const f = (iso: string) => new Date(iso).toISOString().replace(/[-:]|\.\d{3}/g, "");
@@ -68,6 +75,8 @@ export default function BookingFlow() {
       const b = await createAppointment({ barberId: barber.id, serviceId: service.id, startAt: slot, ...form });
       try { localStorage.setItem("alan-cliente", JSON.stringify(form)); } catch {}
       setDone(b); setStep(5);
+      fetch("/api/calendar-sync", { method: "POST", body: JSON.stringify({ token: b.token }) }).catch(() => {});
+      if (form.email.trim()) fetch("/api/booking-email", { method: "POST", body: JSON.stringify({ token: b.token }) }).catch(() => {});
     } catch (e) {
       setError(e instanceof SlotUnavailableError ? e.message : "No pudimos reservar. Probá de nuevo.");
       if (e instanceof SlotUnavailableError) { loadDays(barber, service); setSlot(undefined); setStep(3); }
@@ -111,8 +120,8 @@ export default function BookingFlow() {
 
           {step === 3 && (
             <div className="grid grid-cols-3 gap-2">
-              {slots.map((s) => (
-                <button key={s} onClick={() => { setSlot(s); setStep(4); }} className="min-h-14 rounded-xl border border-white/15 transition hover:bg-white hover:text-black">{fmtTime(s)}</button>
+              {slots.map((s, i) => (
+                <motion.button key={s} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.035 }} whileTap={{ scale: 0.95 }} onClick={() => { setSlot(s); setStep(4); }} className="min-h-14 rounded-xl border border-white/15 transition hover:bg-white hover:text-black">{fmtTime(s)}</motion.button>
               ))}
               {!slots.length && <p className="col-span-3 text-white/50">No quedan horarios ese día.</p>}
             </div>
@@ -144,10 +153,11 @@ export default function BookingFlow() {
 
           {step === 5 && done && barber && service && slot && date && (
             <>
-              <div className="grid h-14 w-14 place-items-center rounded-full bg-white text-black"><Check /></div>
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 260, damping: 14 }} className="grid h-14 w-14 place-items-center rounded-full bg-white text-black"><Check /></motion.div>
               <p>Tu turno está reservado.</p>
               <p className="rounded-xl border border-white/15 p-4 capitalize">{barber.name}<br />{service.name}<br />{fmtDate(date)} · {fmtTime(slot)}</p>
-              <button className={btn} onClick={() => downloadIcs(slot, done.endsAt, `${service.name} en ${siteConfig.name}`)}>Agregar al calendario</button>
+              <a className={btn + " flex items-center"} target="_blank" rel="noreferrer" href={gcalUrl(slot, done.endsAt, `${service.name} en ${siteConfig.name}`)}>Agregar a Google Calendar</a>
+              <button className="text-sm text-white/50 underline" onClick={() => downloadIcs(slot, done.endsAt, `${service.name} en ${siteConfig.name}`)}>Apple / Outlook (.ics)</button>
               <a className={btn + " flex items-center"} href={bookingWhatsAppLink({ barber: barber.name, service: service.name, date: fmtDate(date), time: fmtTime(slot), name: form.name })}>Enviar reserva por WhatsApp</a>
               <a className={btn + " flex items-center"} href="/">Volver al inicio</a>
             </>

@@ -1,4 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
+import Reveal from "@/components/ui/Reveal";
+import Gallery from "@/components/ui/Gallery";
+import HeroGlow from "@/components/ui/HeroGlow";
 import { createClient } from "@supabase/supabase-js";
 import { siteConfig, whatsappLink } from "@/config/siteConfig";
 
@@ -22,43 +26,45 @@ export default async function Home() {
       </header>
 
       <main>
-        <section className="grid min-h-[80dvh] content-end gap-6 bg-gradient-to-b from-neutral-900 to-black px-5 pb-16">
-          <h1 className="text-6xl font-extrabold leading-none md:text-8xl">ALAN<br />Barber &amp; Co.</h1>
-          <p className="max-w-sm text-lg text-white/70">Reservá. Sentate. Salí distinto.</p>
-          <div className="flex gap-3">
+        <section className="relative isolate grid min-h-[80dvh] content-end gap-6 overflow-hidden bg-gradient-to-b from-neutral-900 to-black px-5 pb-16"><HeroGlow />
+          <Reveal><h1 className="text-6xl font-extrabold leading-none md:text-8xl">ALAN<br />Barber &amp; Co.</h1></Reveal>
+          <Reveal delay={0.15}><p className="max-w-sm text-lg text-white/70">Reservá. Sentate. Salí distinto.</p></Reveal>
+          <Reveal delay={0.3} className="flex gap-3">
             <Link href="/reservar" className="rounded-full bg-white px-6 py-4 font-semibold text-black">Reservar turno</Link>
             <a href="#servicios" className="rounded-full border border-white/30 px-6 py-4">Ver servicios</a>
-          </div>
+          </Reveal>
         </section>
 
         <section id="servicios" className="mx-auto max-w-3xl px-5 py-16">
           <h2 className="mb-6 text-3xl font-bold">Nuestros servicios</h2>
-          <ul className="divide-y divide-white/10 border-y border-white/10">
+          <Reveal><ul className="divide-y divide-white/10 border-y border-white/10">
             {services?.map((s) => (
-              <li key={s.id} className="flex items-center justify-between py-5 transition-colors hover:bg-white/5">
+              <li key={s.id} className="flex items-center justify-between py-5 transition-all duration-300 hover:bg-white/5 hover:pl-4">
                 <div><p className="text-lg font-semibold">{s.name}</p><p className="text-sm text-white/50">{s.duration_minutes} min</p></div>
                 <p className="text-[#b08d57]">{money(s.price)}</p>
               </li>
             ))}
-          </ul>
+          </ul></Reveal>
         </section>
 
         <section id="barberos" className="mx-auto max-w-3xl px-5 py-16">
           <h2 className="mb-6 text-3xl font-bold">Elegí quién te atiende.</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            {barbers?.map((b) => (
-              <Link key={b.id} href={`/reservar?barbero=${b.id}`} className="group relative block aspect-[3/4] overflow-hidden bg-neutral-800">
+            {barbers?.map((b, i) => (
+              <Reveal key={b.id} delay={i * 0.12}><Link href={`/reservar?barbero=${b.id}`} className="group relative block aspect-[3/4] overflow-hidden bg-neutral-800">
                 {/* Reemplazar por <Image src={b.photo_url} /> cuando haya fotos */}
-                <span className="absolute inset-0 grid place-items-center text-7xl font-bold text-white/10">{b.name[0]}</span>
+                {b.photo_url ? <Image src={b.photo_url} alt={b.name} fill sizes="(min-width:640px) 400px, 100vw" className="object-cover transition duration-700 group-hover:scale-105" /> : <span className="absolute inset-0 grid place-items-center text-7xl font-bold text-white/10 transition duration-700 group-hover:scale-110">{b.name[0]}</span>}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black p-5">
                   <p className="text-2xl font-bold">{b.name}</p>
                   <p className="text-sm text-white/60">{b.description}</p>
                   <p className="mt-3 text-sm font-semibold opacity-80 transition group-hover:opacity-100">Reservar con {b.name.split(" ")[0]}</p>
                 </div>
-              </Link>
+              </Link></Reveal>
             ))}
           </div>
         </section>
+
+        <Gallery images={siteConfig.gallery} />
 
         <section id="ubicacion" className="mx-auto max-w-3xl px-5 py-16">
           <h2 className="mb-4 text-3xl font-bold">Ubicación</h2>

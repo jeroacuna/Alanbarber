@@ -4,7 +4,9 @@ export const siteConfig = {
   shortName: "ALAN",
   tagline: "Tu estilo empieza acá.",
   timezone: "America/Argentina/Buenos_Aires",
-  instagram: { handle: "@alanbarber", url: "INSTAGRAM_URL" },
+  instagram: { handle: "@alanbarberandco", url: "https://instagram.com/alanbarberandco" },
+  // Fotos del local/cortes: poné los archivos en /public/gallery y listalos acá, ej: "/gallery/1.jpg"
+  gallery: [] as string[],
   whatsapp: { number: "BARBER_PHONE" }, // formato internacional sin +, ej: 54343XXXXXXX
   address: {
     line1: "Buenos Aires 60, Local 5",
